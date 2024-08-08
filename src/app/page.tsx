@@ -1,95 +1,75 @@
+'use client';
+
+
+import { Authenticator } from '@aws-amplify/ui-react'
+import '@aws-amplify/ui-react/styles.css'
 import Image from "next/image";
 import styles from "./page.module.css";
+import React from "react"
+import {useState} from "react"
+import { set, useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+
+
+type Inputs = {
+  name: string
+  age: string
+  mail: string
+}
+
+const schema= yup 
+  .object()
+  .shape({
+    name: yup.string().required(),
+    age: yup.number().required(),
+    mail: yup.string().required(),
+  })
+  .required()
+
 
 export default function Home() {
+  const { register, handleSubmit } = useForm<Inputs>({
+    resolver: yupResolver(schema), 
+  })
+
+  const [input, setInput] = useState("");
+  const [todoLists, setTodo] = useState([]);
+  const addTodo = (e) => {
+    e.preventDefault();
+    setTodo([...todoLists, input]);
+    setInput("");
+  }
+  const deleteTodo = (index) => {
+    const newTodoLists = todoLists.filter((_,i) => i !== index);
+    setTodo(newTodoLists);
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
+      <Authenticator>
+      {({ signOut, user }) => (
+        <main>
+        <div>Hello world</div>
+        <form onSubmit={addTodo}>
+          <input 
+            {...register("name")} 
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+          <button type="submit">追加</button>
+        </form>
+        <ul>
+          {todoLists.map((item, index) => (
+            <li key={index}>
+              {item}
+              <button onClick={()=>deleteTodo(index)}>消去</button>
+            </li>
+          ))}
+        </ul>
+      
+      <button onClick={signOut}>Sign out</button>
+      </main>
+      )}
+      </Authenticator>
   );
 }
