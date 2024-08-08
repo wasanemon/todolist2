@@ -76,9 +76,12 @@ export default function Home() {
           <button type="submit">追加</button>
         </form>
         <ul>
-        {todoLists.map(({id, content}) => (
-          <li key={id}>{content}<button onClick={()=>deleteTodo(id)}>消去</button></li>
-        ))}
+          {todoLists.map((todo) => (
+            <li key={todo.id}>
+              {todo.content}
+              <button onClick={() => deleteTodo(todo.id)}>消去</button>
+            </li>
+          ))}
         </ul>
       
       <button onClick={signOut}>Sign out</button>
