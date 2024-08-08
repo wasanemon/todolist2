@@ -6,43 +6,58 @@ import '@aws-amplify/ui-react/styles.css'
 import Image from "next/image";
 import styles from "./page.module.css";
 import React from "react"
-import {useState} from "react"
+import { useState, useEffect } from "react";
 import { set, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import { Amplify } from 'aws-amplify';
+import outputs from '../../amplify_outputs.json';
+import type { Schema } from '../../amplify/data/resource'
+import { generateClient } from 'aws-amplify/data'
+
+Amplify.configure(outputs);
+const client = generateClient<Schema>()
 
 
 type Inputs = {
-  name: string
-  age: string
-  mail: string
+  content: string
 }
 
 const schema= yup 
   .object()
   .shape({
-    name: yup.string().required(),
-    age: yup.number().required(),
-    mail: yup.string().required(),
+    content: yup.string().required(),
   })
   .required()
 
 
 export default function Home() {
-  const { register, handleSubmit } = useForm<Inputs>({
+  const { register, handleSubmit, reset} = useForm<Inputs>({
     resolver: yupResolver(schema), 
   })
+  
+  const [todoLists, setTodo] = useState<Schema["Todo"]["type"][]>([]);
 
-  const [input, setInput] = useState("");
-  const [todoLists, setTodo] = useState([]);
-  const addTodo = (e) => {
-    e.preventDefault();
-    setTodo([...todoLists, input]);
-    setInput("");
+  const fetchTodos = async () => {
+    const { data: items, errors } = await client.models.Todo.list();
+    setTodo(items);
+  };
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const addTodo = async (data: Inputs) => {
+    await client.models.Todo.create({
+      content: data.content,
+      isDone: false,
+    })
+    fetchTodos();
+    reset();
   }
-  const deleteTodo = (index) => {
-    const newTodoLists = todoLists.filter((_,i) => i !== index);
-    setTodo(newTodoLists);
+  const deleteTodo = async (id: string) => {
+    await client.models.Todo.delete({id});
+    fetchTodos();
   }
 
   return (
@@ -50,21 +65,16 @@ export default function Home() {
       {({ signOut, user }) => (
         <main>
         <div>Hello world</div>
-        <form onSubmit={addTodo}>
+        <form onSubmit={handleSubmit(addTodo)}>
           <input 
-            {...register("name")} 
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            />
+            {...register("content")} 
+          />
           <button type="submit">追加</button>
         </form>
         <ul>
-          {todoLists.map((item, index) => (
-            <li key={index}>
-              {item}
-              <button onClick={()=>deleteTodo(index)}>消去</button>
-            </li>
-          ))}
+        {todoLists.map(({ id, content }) => (
+          <li key={id}>{content}<button onClick={()=>deleteTodo(id)}>消去</button></li>
+        ))}
         </ul>
       
       <button onClick={signOut}>Sign out</button>
