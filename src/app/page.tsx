@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import { set, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import { Amplify } from 'aws-amplify';
+import { Amplify, Logger } from 'aws-amplify';
 import outputs from '../../amplify_outputs.json';
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/data'
@@ -25,9 +25,6 @@ const client = generateClient<Schema>();
 
 
 export default function Home() {
-  type Inputs = {
-    content: string
-  }
   
   const schema= yup 
     .object()
