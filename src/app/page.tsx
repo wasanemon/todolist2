@@ -18,9 +18,7 @@ import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/data'
 
 Amplify.configure(outputs);
-const client = generateClient<Schema>({
-  authMode: 'apiKey',
-});
+const client = generateClient<Schema>();
 
 
 
