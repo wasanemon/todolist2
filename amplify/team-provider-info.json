@@ -10,6 +10,11 @@
       "StackName": "amplify-tutorial-dev-d01dd",
       "StackId": "arn:aws:cloudformation:ap-northeast-1:361141530272:stack/amplify-tutorial-dev-d01dd/78cf3af0-55a0-11ef-868b-06648961b415",
       "AmplifyAppId": "d9zvg757bywbb"
+    },
+    "categories": {
+      "api": {
+        "tutorial": {}
+      }
     }
   }
 }
