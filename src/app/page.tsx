@@ -21,19 +21,20 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>()
 
 
-type Inputs = {
-  content: string
-}
-
-const schema= yup 
-  .object()
-  .shape({
-    content: yup.string().required(),
-  })
-  .required()
 
 
 export default function Home() {
+  type Inputs = {
+    content: string
+  }
+  
+  const schema= yup 
+    .object()
+    .shape({
+      content: yup.string().required(),
+    })
+    .required()
+  
   const { register, handleSubmit, reset} = useForm<Inputs>({
     resolver: yupResolver(schema), 
   })
@@ -75,7 +76,7 @@ export default function Home() {
           <button type="submit">追加</button>
         </form>
         <ul>
-        {todoLists.map(({ id, content }) => (
+        {todoLists.map(({id, content}) => (
           <li key={id}>{content}<button onClick={()=>deleteTodo(id)}>消去</button></li>
         ))}
         </ul>
