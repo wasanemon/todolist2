@@ -18,7 +18,10 @@ import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/data'
 
 Amplify.configure(outputs);
-const client = generateClient<Schema>()
+const client = generateClient<Schema>({
+  authMode: 'apiKey',
+});
+
 
 
 
@@ -43,7 +46,7 @@ export default function Home() {
 
   const fetchTodos = async () => {
     const { data: items, errors } = await client.models.Todo.list();
-    setTodo([...items]);
+    await setTodo([...items]);
   };
 
 
@@ -56,12 +59,12 @@ export default function Home() {
       content: data.content,
       isDone: false,
     })
-    fetchTodos();
-    reset();
+    await fetchTodos();
+    await reset();
   }
   const deleteTodo = async (id: string) => {
     await client.models.Todo.delete({id});
-    fetchTodos();
+    await fetchTodos();
   }
 
   return (
