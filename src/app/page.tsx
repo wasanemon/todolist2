@@ -15,6 +15,25 @@ import { Amplify, Logger } from 'aws-amplify';
 import outputs from '../../amplify_outputs.json';
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/data'
+import {
+  Alert,
+  Button,
+  Card,
+  Divider,
+  FormLabel,
+  Input,
+  Slide,
+  SlideProps,
+  Snackbar,
+  Stack,
+  Typography,
+  Box,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  TextField
+} from "@mui/material";
 
 Amplify.configure(outputs);
 const client = generateClient<Schema>({
@@ -25,11 +44,11 @@ function TodoList({ signOut, user }) {
   const schema = yup 
     .object()
     .shape({
-      content: yup.string().required(),
+      content: yup.string().required("Todo content is required"),
     })
     .required()
   
-  const { register, handleSubmit, reset } = useForm<Inputs>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
     resolver: yupResolver(schema), 
   })
   
@@ -65,24 +84,50 @@ function TodoList({ signOut, user }) {
   }
 
   return (
-    <main>
-      <div>Hello world</div>
+    <Box sx={{ width: '100%', maxWidth: 600, margin: 'auto' }}>
       <form onSubmit={handleSubmit(addTodo)}>
-        <input 
-          {...register("content")} 
+        <TextField
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          {...register("content")}
+          error={!!errors.content}
+          helperText={errors.content?.message}
+          placeholder="Enter new todo"
         />
-        <button type="submit">追加</button>
+        <Button 
+          type="submit" 
+          variant="contained" 
+          color="primary" 
+          fullWidth
+          sx={{ mt: 2, mb: 2 }}
+        >
+          Add Todo
+        </Button>
       </form>
-      <ul>
+      <List>
         {todoLists.map((todo) => (
-          <li key={todo.id}>
-            {todo.content}
-            <button onClick={() => deleteTodo(todo.id)}>消去</button>
-          </li>
+          <ListItem
+            key={todo.id}
+            secondaryAction={
+              <Button 
+                variant="outlined" 
+                color="secondary" 
+                onClick={() => deleteTodo(todo.id)}
+                size="small"
+              >
+                Delete
+              </Button>
+            }
+          >
+            <ListItemText primary={todo.content} />
+          </ListItem>
         ))}
-      </ul>
-      <button onClick={signOut}>Sign out</button>
-    </main>
+      </List>
+      <Button variant="outlined" onClick={signOut} sx={{ mt: 2 }}>
+        Sign Out
+      </Button>
+    </Box>
   );
 }
 
@@ -90,7 +135,14 @@ export default function Home() {
   return (
     <Authenticator>
       {({ signOut, user }) => (
-        <TodoList signOut={signOut} user={user} />
+        <Box display="flex" justifyContent="center">
+          <Paper elevation={3} sx={{ padding: 3, width: '100%', maxWidth: 800, marginTop: 3 }}>
+            <Typography variant="h4" gutterBottom>
+              Todo List
+            </Typography>
+            <TodoList signOut={signOut} user={user} />
+          </Paper>
+        </Box>
       )}
     </Authenticator>
   );
