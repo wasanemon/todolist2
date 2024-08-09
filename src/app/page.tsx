@@ -2,7 +2,6 @@
 
 'use client';
 
-
 import { Authenticator } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
 import Image from "next/image";
@@ -22,17 +21,15 @@ const client = generateClient<Schema>({
   authMode: "userPool",
 });
 
-
-export default function Home() {
-  
-  const schema= yup 
+function TodoList({ signOut, user }) {
+  const schema = yup 
     .object()
     .shape({
       content: yup.string().required(),
     })
     .required()
   
-  const { register, handleSubmit, reset} = useForm<Inputs>({
+  const { register, handleSubmit, reset } = useForm<Inputs>({
     resolver: yupResolver(schema), 
   })
   
@@ -41,15 +38,9 @@ export default function Home() {
   const fetchTodos = async () => {
     const { data: items, errors } = await client.models.Todo.list({
       authMode: "userPool",
-      //filter: {
-        //userId: {
-          //eq: user?.userId,
-        //},
-      //},
     });
-    await setTodo(items);
+    setTodo(items);
   };
-
 
   useEffect(() => {
     fetchTodos();
@@ -57,46 +48,50 @@ export default function Home() {
 
   const addTodo = async (data: Inputs) => {
     await client.models.Todo.create({
-      //userId: user?.userId ?? "",
       content: data.content,
       isDone: false,
     },
-
     {
       authMode: 'userPool',
     }
   )
-    await fetchTodos();
-    await reset();
+    fetchTodos();
+    reset();
   }
+
   const deleteTodo = async (id: string) => {
     await client.models.Todo.delete({id});
-    await fetchTodos();
+    fetchTodos();
   }
 
   return (
-      <Authenticator>
-      {({ signOut, user }) => (
-        <main>
-        <div>Hello worlddd</div>
-        <form onSubmit={handleSubmit(addTodo)}>
-          <input 
-            {...register("content")} 
-          />
-          <button type="submit">追加d</button>
-        </form>
-        <ul>
-          {todoLists.map((todo) => (
-            <li key={todo.id}>
-              {todo.content}
-              <button onClick={() => deleteTodo(todo.id)}>消去</button>
-            </li>
-          ))}
-        </ul>
-      
+    <main>
+      <div>Hello world</div>
+      <form onSubmit={handleSubmit(addTodo)}>
+        <input 
+          {...register("content")} 
+        />
+        <button type="submit">追加</button>
+      </form>
+      <ul>
+        {todoLists.map((todo) => (
+          <li key={todo.id}>
+            {todo.content}
+            <button onClick={() => deleteTodo(todo.id)}>消去</button>
+          </li>
+        ))}
+      </ul>
       <button onClick={signOut}>Sign out</button>
-      </main>
+    </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Authenticator>
+      {({ signOut, user }) => (
+        <TodoList signOut={signOut} user={user} />
       )}
-      </Authenticator>
+    </Authenticator>
   );
 }
