@@ -16,7 +16,7 @@ import { Amplify, Logger } from 'aws-amplify';
 import outputs from '../../amplify_outputs.json';
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/data'
-
+import { withAuthenticator, WithAuthenticatorProps } from '@aws-amplify/ui-react';
 Amplify.configure(outputs);
 const client = generateClient<Schema>({
   authMode: "userPool",
@@ -26,7 +26,7 @@ const client = generateClient<Schema>({
 
 
 
-export default function Home() {
+const Todo = ({ signOut, user}: WithAuthenticatorProps) => {
   
   const schema= yup 
     .object()
@@ -44,11 +44,11 @@ export default function Home() {
   const fetchTodos = async () => {
     const { data: items, errors } = await client.models.Todo.list({
       authMode: "userPool",
-      //filter: {
-        //userId: {
-          //eq: user?.userId,
-        //},
-      //},
+      filter: {
+        userId: {
+          eq: user?.userId,
+        },
+      },
     });
     await setTodo(items);
   };
@@ -58,9 +58,9 @@ export default function Home() {
     fetchTodos();
   }, []);
 
-  const addTodo = async (data: Inputs) => {
+  const addTodo = async () => {
     await client.models.Todo.create({
-      //userId: user?.userId ?? "",
+      userId: user?.userId ?? "",
       content: data.content,
       isDone: false,
     },
@@ -78,15 +78,13 @@ export default function Home() {
   }
 
   return (
-      <Authenticator>
-      {({ signOut, user }) => (
         <main>
         <div>Hello world</div>
         <form onSubmit={handleSubmit(addTodo)}>
           <input 
             {...register("content")} 
           />
-          <button type="submit">追加d</button>
+          <button type="submit">追加ds</button>
         </form>
         <ul>
           {todoLists.map((todo) => (
@@ -100,6 +98,4 @@ export default function Home() {
       <button onClick={signOut}>Sign out</button>
       </main>
       )}
-      </Authenticator>
-  );
-}
+export default withAuthenticator(Todo);
