@@ -23,9 +23,6 @@ const client = generateClient<Schema>({
 });
 
 
-
-
-
 export default function Home() {
   
   const schema= yup 
