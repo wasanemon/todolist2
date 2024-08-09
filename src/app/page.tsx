@@ -78,7 +78,7 @@ export default function Home() {
       <Authenticator>
       {({ signOut, user }) => (
         <main>
-        <div>Hello world</div>
+        <div>Hello worlddd</div>
         <form onSubmit={handleSubmit(addTodo)}>
           <input 
             {...register("content")} 
