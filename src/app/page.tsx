@@ -82,7 +82,7 @@ export default function Home() {
               <input 
                 {...register("content")} 
               />
-              <button type="submit">追加</button>
+              <button type="submit">追s加</button>
             </form>
             <ul>
               {todoLists.map((todo) => (
