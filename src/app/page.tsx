@@ -55,7 +55,11 @@ export default function Home() {
     await client.models.Todo.create({
       content: data.content,
       isDone: false,
-    })
+    },
+    {
+      authMode: 'userPool',
+    }
+  )
     await fetchTodos();
     await reset();
   }
