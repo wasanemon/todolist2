@@ -42,7 +42,9 @@ export default function Home() {
   const [todoLists, setTodo] = useState<Schema["Todo"]["type"][]>([]);
 
   const fetchTodos = async () => {
-    const { data: items, errors } = await client.models.Todo.list();
+    const { data: items, errors } = await client.models.Todo.list({
+      authMode: "userPool",
+    });
     await setTodo([...items]);
   };
 
