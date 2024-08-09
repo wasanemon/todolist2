@@ -44,6 +44,11 @@ export default function Home() {
   const fetchTodos = async () => {
     const { data: items, errors } = await client.models.Todo.list({
       authMode: "userPool",
+      filter: {
+        userId: {
+          eq: user?.userId,
+        },
+      },
     });
     await setTodo([...items]);
   };
@@ -55,9 +60,11 @@ export default function Home() {
 
   const addTodo = async (data: Inputs) => {
     await client.models.Todo.create({
+      userId: user?.userId ?? "",
       content: data.content,
       isDone: false,
     },
+
     {
       authMode: 'userPool',
     }

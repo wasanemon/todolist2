@@ -6,7 +6,7 @@ const schema = a.schema({
       id: a.string(),
       content: a.string(),
       isDone: a.boolean(),
-      owner: a.string()  
+      userId: a.string()  
     })
     .authorization((allow) => [
       allow.owner(),
